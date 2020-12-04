@@ -206,10 +206,22 @@ int main(int argc, char *argv[])
  ***/
 int random_matrix(char *matrixname, double *matrix, int matrix_size)
 {
-}
+    int i, j;
+    double r;
+    srand(time(NULL));
 
-//print_matrix(matrixname, matrix, matrix_size);
-return matrix_size;
+    for (i = 0; i < matrix_size; i++)
+    {
+        for (j = 0; j < matrix_size; j++)
+        {
+            r = (double)(rand() % 10000);
+            r /= 100;
+            matrix[i * matrix_size + j] = r;
+        }
+    }
+
+    //print_matrix(matrixname, matrix, matrix_size);
+    return matrix_size;
 }
 
 /***
