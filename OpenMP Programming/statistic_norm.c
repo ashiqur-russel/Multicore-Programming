@@ -234,4 +234,18 @@ int random_matrix(char *matrixname, double *matrix, int matrix_size)
  ***/
 void print_matrix(char *matrixname, double *matrix, int matrix_size)
 {
+    int i, j;
+
+    FILE *fp = stdout;
+    fprintf(fp, "Name: %s\n", matrixname);
+
+    for (i = 0; i < matrix_size; i++)
+    {
+        for (j = 0; j < matrix_size; j++)
+        {
+            fprintf(fp, "%f;", matrix[i * matrix_size + j]);
+        }
+        fprintf(fp, "\n");
+    }
+    fprintf(fp, "\n");
 }
