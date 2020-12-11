@@ -119,3 +119,179 @@ int list_add(list_t *list, int item)
     pred->next = new_node;
     return true;
 }
+
+/***
+ *  remove an element from the list
+ *
+ * @param list   pointer to the list
+ * @param item   the value to be removed from the list
+ * @returns      false if the value not contained, true if the value was removed
+ ***/
+int list_remove(list_t *list, int item)
+{
+
+    node_t *pred = list->head;
+
+    //ignore head element
+    node_t *curr = pred->next;
+
+    //find correct postition of item in list
+    while (item < curr->value && curr != list->tail)
+    {
+        pred = curr;
+        curr = curr->next;
+    }
+
+    //is item in list? if yes, remove node, correct pointers and free memory
+    if (item == curr->value)
+    {
+        pred->next = curr->next;
+        free(curr);
+        return true;
+    }
+    //only reached if item is not in list
+    return false;
+}
+
+/***
+ * Find an element in the list
+ *
+ * @param list   pointer to the list
+ * @param item   the value searched for in the list
+ * @returns      false if the value not contained, true if the value is contained
+ ***/
+int list_find(list_t *list, int item)
+{
+
+    node_t *pred = list->head;
+
+    //ignore head element
+    node_t *curr = pred->next;
+
+    //find correct postition of item in list
+    while (item < curr->value && curr != list->tail)
+    {
+        pred = curr;
+        curr = curr->next;
+    }
+
+    //is item in list?
+    if (item == curr->value)
+    {
+        return true;
+    }
+    //only reached if item is not in list
+    return false;
+}
+
+/*********************************************************************************************
+ * Function declarations overwritten by OpenSubmit
+ ********************************************************************************************/
+
+void print_list(list_t *);
+void prefill_list(list_t *, const int);
+
+/***
+ * In this function we can define tests for implementation
+ *
+ * @param list    a pointer to the list
+ ***/
+void check_list(list_t *list)
+{
+    //write your own tests here
+}
+
+/*********************************************************************************************
+ *  changes should be made inside the list functions.
+ ********************************************************************************************/
+
+int main(int argc, char **argv)
+{
+
+    int max_length = 1000;
+    unsigned int test_ops = 100000;
+
+    unsigned int i;
+    list_t *list = init_list();
+    srand(100);
+    prefill_list(list, max_length);
+
+    //start test scenario with calls to the different list functions
+    printf("Starting test...\n");
+    fflush(stdout);
+    double start = omp_get_wtime();
+#ifdef START_PARALLEL
+#pragma omp parallel for private(i)
+#endif
+    // This loop is parallelized
+    for (i = 0; i < test_ops; i++)
+    {
+        int r = rand() % max_length;
+        switch (i % 3)
+        {
+        case 0:
+            list_add(list, r);
+            break;
+        case 1:
+            list_find(list, r);
+            break;
+        case 2:
+            list_remove(list, r);
+            break;
+        default:
+            printf("Default case reached!\n");
+        }
+    }
+    check_list(list);
+
+    double end = omp_get_wtime();
+    printf("Time taken: %f seconds\n", end - start);
+
+    destroy_list(list);
+
+    return EXIT_SUCCESS;
+}
+
+/*********************************************************************************************
+ * The remainder of this file consists of helper functions.
+ * These functions should not be changed
+ ********************************************************************************************/
+
+/***
+ * fills the list with (max_length/2) random elements for the test scenario
+ *
+ * @param list         a pointer to the list
+ * @param max_length   the maximum number of elements to be contained in the list
+ ***/
+void prefill_list(list_t *list, const int max_length)
+{
+    int i;
+    //  prefill the data structure
+    for (i = 0; i < max_length / 2; i++)
+    {
+        int r = rand() % max_length;
+        list_add(list, r);
+    }
+}
+
+/***
+ * Print the list
+ *
+ * @param list    a pointer to the list
+ ***/
+void print_list(list_t *list)
+{
+    node_t *d;
+    if (list->head == NULL || list->tail == NULL)
+    {
+        return;
+    }
+
+    for (d = list->head; d != NULL; d = d->next)
+    {
+        printf("%d ", d->value);
+    }
+    printf("\n");
+}
+
+#endif
